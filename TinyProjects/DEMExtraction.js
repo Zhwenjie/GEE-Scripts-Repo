@@ -6,10 +6,8 @@ Tips:
 1. when we export the raster data with range more than 10 degree, GEE would 
 automatically store them in multiple pieces. What's more, they would fill 
 masked areas with zero instead of null.
-
 2. we can use at least two approaches to extract the elevation information
 of points by interation add properties and reduceRegion function.
-
 3.we might fail to get desired export result after union feature collection.
 */
 var Gauges = table;
