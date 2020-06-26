@@ -10,6 +10,7 @@ masked areas with zero instead of null.
 2. we can use at least two approaches to extract the elevation information
 of points by interation add properties and reduceRegion function.
 
+3.we might fail to get desired export result after union feature collection.
 */
 var Gauges = table;
 print(Gauges)
@@ -19,14 +20,19 @@ var elevation = dataset.select('elevation');
 var slope = ee.Terrain.slope(elevation);
 //Map.setCenter(92.41, 34.3, 10);
 
-
+//////the first method
 var addProp = function(point)
 {
   //var g = feat.geometry().coordinates();
   var k = elevation.reduceRegion(ee.Reducer.first(),point.geometry(),30);
   return point.set({'elev':k.get('elevation')});
 }
-
+//////the second method
+// var stations_mean = elevation.reduceRegions({
+//   collection:bufferedFluxsite,
+//   reducer:ee.Reducer.mean(),
+//   scale:30
+// })
 var newGauges = Gauges.map(addProp);
 print(newGauges);
 
@@ -38,21 +44,12 @@ print(newGauges);
 
 // });
 
-
 var buffer = function(feature) {
   return feature.buffer(3200);
 };
 
-
 var bufferedFluxsite = Gauges.map(buffer);  
 print(bufferedFluxsite)
-
-// var stations_mean = elevation.reduceRegions({
-//   collection:bufferedFluxsite,
-//   reducer:ee.Reducer.mean(),
-//   scale:30
-// })
-
 
 // var bufferedFluxsiteU = bufferedFluxsite.union()
 // print(bufferedFluxsiteU)
