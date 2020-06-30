@@ -41,7 +41,6 @@ print(newGauges);
 //   description: 'ChineseGaugeswithelevation',
 //   fileFormat: 'CSV',
 //   folder:'GEE'
-
 // });
 
 var buffer = function(feature) {
