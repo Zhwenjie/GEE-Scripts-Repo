@@ -21,12 +21,11 @@ var slope = ee.Terrain.slope(elevation);
 //Map.setCenter(92.41, 34.3, 10);
 
 //////the first method
-var addProp = function(point)
-{
+var addProp = function(point){
   //var g = feat.geometry().coordinates();
   var k = elevation.reduceRegion(ee.Reducer.first(),point.geometry(),30);
   return point.set({'elev':k.get('elevation')});
-}
+  }
 //////the second method
 // var stations_mean = elevation.reduceRegions({
 //   collection:bufferedFluxsite,
