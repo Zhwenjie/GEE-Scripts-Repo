@@ -9,6 +9,8 @@ masked areas with zero instead of null.
 2. we can use at least two approaches to extract the elevation information
 of points by interation add properties and reduceRegion function.
 3.we might fail to get desired export result after union feature collection.
+4.Set the value for null 
+QandA link: https://mail.google.com/mail/u/0/#label/GEE-Forum%2FQandA/FMfcgxwJWXWNVzpBgvSZsSFffzXFDDGg
 */
 var Gauges = table;
 print(Gauges)
@@ -52,7 +54,10 @@ print(bufferedFluxsite)
 // var bufferedFluxsiteU = bufferedFluxsite.union()
 // print(bufferedFluxsiteU)
 
-var DEMClip = elevation.clip(bufferedFluxsite)
+var DEMClip = elevation.clip(bufferedFluxsite);
+var DEMClip_ = DEMClip.eq(DEMClip);//assume that all value in DEM is valid
+var mask_img = DEMClip.updateMask(DEMClip_);
+var unmasked = mask_img.unmask(-9999); // The value is what you want to set masked pixels to
 
 Export.image.toDrive({
   image: DEMClip,
@@ -61,6 +66,7 @@ Export.image.toDrive({
   folder:'DEM',
   scale:30,
   region:bufferedFluxsite,
+  skipEmptyTiles:true,
   crs:'EPSG:4326',
   maxPixels:1e13
   });
