@@ -2,6 +2,11 @@
 please reference to the file of Multipolygon2One and the following link:
 https://groups.google.com/forum/#!searchin/google-earth-engine-developers/Feature$20collection$20union%7Csort:date/google-earth-engine-developers/g_S0-wnq6kA/1PPEMfyJAAAJ
 https://code.earthengine.google.com/4f84bfdf88d32d3fa73cb954370e68fe
+Tips:
+When error as below is returned, it perhaps caused by data type.
+Geometries cannot have their properties modified or be placed into collections
+For example, if we return line rather than ee.Feature(line), we would be unable to
+create ee.FeatureCollection().
 */
 
 
