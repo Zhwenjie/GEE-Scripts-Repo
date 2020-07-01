@@ -6,7 +6,9 @@ https://code.earthengine.google.com/303f6be0524cb4480f44b11ce0124ba0
 https://groups.google.com/forum/#!searchin/google-earth-engine-developers/Feature$20collection$20union%7Csort:date/google-earth-engine-developers/g_S0-wnq6kA/1PPEMfyJAAAJ
 https://code.earthengine.google.com/4f84bfdf88d32d3fa73cb954370e68fe
 
-main function: polygons.merge(holes).geometry().dissolve();
+Two methods: 
+1.polygons.merge(holes).geometry().dissolve();
+2.polygons.merge(holes).union();
 */
 {
 var geometry = 
@@ -83,12 +85,14 @@ var holes = polygonsWithHoles.map(function(f) {
   return f.setGeometry(g)
 })
 print(holes)
-var polygonholesUnion = polygons.merge(holes).geometry().dissolve();
- 
+var polygonholesUnion1 = polygons.merge(holes).geometry().dissolve();
+var polygonholesUnion2 = polygons.merge(holes).union();
+
 Map.addLayer(holes, {color: 'green' },'hole');
 Map.addLayer(polygons, {color: 'red' },'polygons');
 Map.addLayer(polygonsWithHoles, {color: 'blue' },'polygonsWithHoles');
-Map.addLayer(polygonholesUnion, {color: 'blue' },'polygonholesUnion');
+Map.addLayer(polygonholesUnion1, {color: 'blue' },'polygonholesUnion1');
+Map.addLayer(polygonholesUnion2, {color: 'blue' },'polygonholesUnion2');
 
 print('Geometry without holes area: ', geometry.area(1))
 print('Polygons area: ', polygons.geometry().area(1))
