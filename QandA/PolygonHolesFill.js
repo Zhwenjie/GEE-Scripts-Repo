@@ -120,7 +120,6 @@ var geomline = ee.FeatureCollection(geomm.map(f2l));
 print('geomline',geomline)
 Map.addLayer(geomline, {color: 'blue'});
 
-
 /*
 deeply understanding on the above functions
 */
