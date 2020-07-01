@@ -4,7 +4,59 @@ https://groups.google.com/forum/#!searchin/google-earth-engine-developers/Featur
 https://code.earthengine.google.com/4f84bfdf88d32d3fa73cb954370e68fe
 */
 
-////---------------------------------polygon with holes---------------------------------------------
+
+////---------------------------------functions---------------------------------------------
+function flattenGeometryCollection(f) {
+  return ee.FeatureCollection(f.geometry().geometries().map(function(g) {
+    return f.setGeometry(g)
+  }))
+}
+
+function flattenMultiPolygon(f) {
+  return ee.FeatureCollection(f.geometry().coordinates().map(function(coords) {
+    return f.setGeometry(ee.Geometry.Polygon(coords))
+  }))
+}
+
+function fillPolygon(f) {
+  return f.setGeometry(ee.Geometry.Polygon(f.geometry().coordinates().get(0)))
+}
+
+
+function fillPolygons(features) {
+  features = features.map(function(f) { return f.set({ geomType: f.geometry().type() }) })
+  
+  // flatten GeometryCollection and MultiPolygon
+  var dataGeometryCollection = features.filter(ee.Filter.eq('geomType', 'GeometryCollection'))
+    .map(flattenGeometryCollection).flatten()
+  
+  var dataMultiPolygon = features.filter(ee.Filter.eq('geomType', 'MultiPolygon'))
+    .map(flattenMultiPolygon).flatten()
+    
+  features = features.filter(ee.Filter.and(
+    ee.Filter.neq('geomType', 'GeometryCollection'),
+    ee.Filter.neq('geomType', 'MultiPolygon')
+    ))
+    .merge(dataGeometryCollection)
+    .merge(dataMultiPolygon)
+    
+  features = features.map(function(f) { return f.set({ geomType: f.geometry().type() }) })
+  
+  // take only polygons and fill holes
+  features = features.filter(ee.Filter.eq('geomType', 'Polygon')).map(fillPolygon)
+  
+  return features.geometry().dissolve()
+}
+////polygine to line display
+var f2l = function(feature){
+  var f2g = ee.Geometry(feature);
+  var latlon = f2g.coordinates().flatten();
+  var lines = ee.Geometry.LineString(latlon);
+  return ee.Feature(lines);
+ };
+ 
+ 
+////---------------------------------application in polygon with holes---------------------------------------------
 {
 var geometry = 
     /* color: #d63000 */
@@ -53,55 +105,20 @@ print('myMultiPoly',myMultiPoly);
 Map.addLayer(myMultiPoly, {}, 'Orgininal');
 Map.centerObject(myMultiPoly);
 
-////---------------------------------functions---------------------------------------------
-function flattenGeometryCollection(f) {
-  return ee.FeatureCollection(f.geometry().geometries().map(function(g) {
-    return f.setGeometry(g)
-  }))
-}
-
-function flattenMultiPolygon(f) {
-  return ee.FeatureCollection(f.geometry().coordinates().map(function(coords) {
-    return f.setGeometry(ee.Geometry.Polygon(coords))
-  }))
-}
-
-function fillPolygon(f) {
-  return f.setGeometry(ee.Geometry.Polygon(f.geometry().coordinates().get(0)))
-}
-
-
-function fillPolygons(features) {
-  features = features.map(function(f) { return f.set({ geomType: f.geometry().type() }) })
-  
-  // flatten GeometryCollection and MultiPolygon
-  var dataGeometryCollection = features.filter(ee.Filter.eq('geomType', 'GeometryCollection'))
-    .map(flattenGeometryCollection).flatten()
-  
-  var dataMultiPolygon = features.filter(ee.Filter.eq('geomType', 'MultiPolygon'))
-    .map(flattenMultiPolygon).flatten()
-    
-  features = features.filter(ee.Filter.and(
-    ee.Filter.neq('geomType', 'GeometryCollection'),
-    ee.Filter.neq('geomType', 'MultiPolygon')
-    ))
-    .merge(dataGeometryCollection)
-    .merge(dataMultiPolygon)
-    
-  features = features.map(function(f) { return f.set({ geomType: f.geometry().type() }) })
-  
-  // take only polygons and fill holes
-  features = features.filter(ee.Filter.eq('geomType', 'Polygon')).map(fillPolygon)
-  
-  return features.geometry().dissolve()
-}
-
 var geom = fillPolygons(ee.FeatureCollection(myMultiPoly));
 print('geom dissolve1',geom )
 // repeat to fill polygons after dissolve
 geom = fillPolygons(ee.FeatureCollection(geom));//not sure the function of this syntax
 print('geom dissolve2',geom )
+var geomm = geom.geometries()
+print('geomm',geomm )
+
 Map.addLayer(geom, {color: 'red'})
+
+var geomline = ee.FeatureCollection(geomm.map(f2l));
+
+print('geomline',geomline)
+Map.addLayer(geomline, {color: 'blue'});
 
 
 /*
@@ -132,3 +149,7 @@ print('set type',Features);
 
 var FeaturesFP = Features.filter(ee.Filter.eq('geomType', 'Polygon')).map(fillPolygon);
 print('fillPolygon',FeaturesFP);
+print('fillPolygon',FeaturesFP.geometry().dissolve());
+print('fillPolygon',FeaturesFP.geometry().dissolve().geometries());
+
+
