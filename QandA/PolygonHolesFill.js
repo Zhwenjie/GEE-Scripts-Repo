@@ -156,4 +156,12 @@ print('fillPolygon',FeaturesFP);
 print('fillPolygon',FeaturesFP.geometry().dissolve());
 print('fillPolygon',FeaturesFP.geometry().dissolve().geometries());
 
-
+////-----------------------------feature collection union---------------------------------------------
+////it indicates that the polygon without the intersection can also be fused.
+var FC = ee.FeatureCollection(FeaturesFP.geometry().dissolve().geometries().
+      map(function(geom){return ee.Feature(ee.Geometry(geom))}));
+print('FC',FC)      
+var FCUnion = FC.union()
+print('FCUnion',FCUnion)
+Map.addLayer(FC,{},'FC');
+Map.addLayer(FCUnion,{},'FCunion');
