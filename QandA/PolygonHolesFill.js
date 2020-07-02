@@ -3,12 +3,12 @@ please reference to the file of Multipolygon2One and the following link:
 https://groups.google.com/forum/#!searchin/google-earth-engine-developers/Feature$20collection$20union%7Csort:date/google-earth-engine-developers/g_S0-wnq6kA/1PPEMfyJAAAJ
 https://code.earthengine.google.com/4f84bfdf88d32d3fa73cb954370e68fe
 Tips:
-When error as below is returned, it perhaps caused by data type.
+1.When error as below is returned, it perhaps caused by data type.
 Geometries cannot have their properties modified or be placed into collections
 For example, if we return line rather than ee.Feature(line), we would be unable to
 create ee.FeatureCollection().
+2.feature collection union
 */
-
 
 ////---------------------------------functions---------------------------------------------
 function flattenGeometryCollection(f) {
@@ -107,6 +107,7 @@ var geometry =
 var myMultiPoly = geometry.difference(geometry2).difference(geometry3)
 var myMultiPolyArea = myMultiPoly.area(1);
 print('myMultiPoly',myMultiPoly);
+
 Map.addLayer(myMultiPoly, {}, 'Orgininal');
 Map.centerObject(myMultiPoly);
 
@@ -118,12 +119,30 @@ print('geom dissolve2',geom )
 var geomm = geom.geometries()
 print('geomm',geomm )
 
-Map.addLayer(geom, {color: 'red'})
-
 var geomline = ee.FeatureCollection(geomm.map(f2l));
-
 print('geomline',geomline)
-Map.addLayer(geomline, {color: 'blue'});
+print('size of geomline',geomline.size())
+Map.addLayer(geom, {color: 'red'})
+Map.addLayer(geomline, {color: 'blue'},'geomline');
+
+////-----------------------------feature collection union---------------------------------------------
+////it indicates that the polygon without the intersection can also be fused.
+var FC = ee.FeatureCollection(geom.geometries().
+      map(function(geom){return ee.Feature(ee.Geometry(geom))}));
+print('FC',FC)      
+var FCUnion = FC.union()
+print('FCUnion',FCUnion)
+Map.addLayer(FC,{},'FC');
+Map.addLayer(FCUnion,{},'FCunion');
+
+////-----------------------------polygon bound coordination---------------------------------------------
+////it indicates that the polygon without the intersection can also be fused.
+var geommbound = geomm.map(function(feature){
+  var fg = ee.Geometry(feature);
+  var fgb = fg.bounds();
+  return fgb.coordinates()
+});
+print('geommbound',geommbound)
 
 /*
 deeply understanding on the above functions
@@ -156,12 +175,3 @@ print('fillPolygon',FeaturesFP);
 print('fillPolygon',FeaturesFP.geometry().dissolve());
 print('fillPolygon',FeaturesFP.geometry().dissolve().geometries());
 
-////-----------------------------feature collection union---------------------------------------------
-////it indicates that the polygon without the intersection can also be fused.
-var FC = ee.FeatureCollection(FeaturesFP.geometry().dissolve().geometries().
-      map(function(geom){return ee.Feature(ee.Geometry(geom))}));
-print('FC',FC)      
-var FCUnion = FC.union()
-print('FCUnion',FCUnion)
-Map.addLayer(FC,{},'FC');
-Map.addLayer(FCUnion,{},'FCunion');
