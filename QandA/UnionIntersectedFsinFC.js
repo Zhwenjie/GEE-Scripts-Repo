@@ -64,7 +64,7 @@ var uniqueValues = polygonArea.aggregate_array('areaSqM');
 print('uniqueValues',uniqueValues)
 
 //var maxValue = ee.List(uniqueValues).length().subtract(1).getInfo();
-var valuesList1 = ee.List.sequence(0, polygons.size().subtract(1));
+var valuesList1 = ee.List.sequence(1, polygons.size());
 
 var polygonId = polygonArea.remap(uniqueValues,valuesList1, 'areaSqM');
 print('polygonId',polygonId);
