@@ -5,7 +5,6 @@ From GEE forum:
 https://code.earthengine.google.com/c0367cc050aa0c917d87b10cad329f30
 */
 
-
 var geometry1 = /* color: #d63000 */ee.Geometry.LineString(
         [[-121.025390625, 48.980216985374994],
          [-112.587890625, 52.32191088594773],
@@ -25,4 +24,4 @@ print(coordstart.zip(coordend).map(function(pts) {
   var p1 = pts.get(0);
   var p2 = pts.get(1);
   return ee.Geometry.Point(p1).distance(ee.Geometry.Point(p2))
-}))
+}));
