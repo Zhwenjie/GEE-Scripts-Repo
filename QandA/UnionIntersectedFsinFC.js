@@ -2,11 +2,7 @@
 /*
 Find out the intersected features in feature collection and union it. We carry it our based on the mutual 
 conversion  between vector and image.
-reference:
-https://code.earthengine.google.com/21e29f828c76f31f203db31e04bbdf97
-https://groups.google.com/forum/#!searchin/google-earth-engine-developers/intersected$20feature%7Csort:date/google-earth-engine-developers/SBX0TCA8yAQ/XHnssyMPAQAJ
 */
-
 var geometry = 
     /* color: #d63000 */
     /* shown: false */
@@ -36,3 +32,60 @@ var polygons = ee.FeatureCollection(geometry.geometries().map(function(g) {
   return ee.Feature(ee.Geometry.Polygon(g.coordinates()))
 }));
 print('polygons',polygons);
+
+/* 
+question, how to convert ee.String to int. feature.id() would return an string,
+but I expect an int type.
+*/
+// var polygonsid = polygons.toList(10).map(function(g) {
+//   return ee.Number(ee.String(ee.Feature(g).id()));//ee.Number is invalid!
+// });
+// print('polygonsid',polygonsid);
+
+var polygonsid = polygons.map(function(g){
+  return g.set({'id': ee.Feature(g).id()});}
+  );
+print('polygonsid',polygonsid);
+
+
+var addArea = function(feature) {
+  return feature.set({areaSqM: feature.geometry().area().divide(1000 * 1000).int()});
+}; 
+
+/////see the difference of polygonArea and AreaFilted
+var polygonArea = polygons.map(addArea);
+print('polygonArea',polygonArea);
+
+////what if the number of uniquevalues is not equal 
+var uniqueValues = polygonArea.distinct(['areaSqM']).aggregate_array('areaSqM');
+var uniqueValues = polygonArea.aggregate_array('areaSqM');
+print('uniqueValues',uniqueValues)
+
+//var maxValue = ee.List(uniqueValues).length().subtract(1).getInfo();
+var valuesList1 = ee.List.sequence(0, polygons.size().subtract(1));
+
+var polygonId = polygonArea.remap(uniqueValues,valuesList1, 'areaSqM');
+print('polygonId',polygonId);
+
+var polygonImage  = polygonId.reduceToImage(['areaSqM'], ee.Reducer.first());
+print(polygonImage);
+var polygonImage  = polygonImage.neq(0);
+var polygonImage  = polygonImage.selfMask();
+
+var polyrange = ee.Geometry.Polygon([
+  [[-180, -60], [180, -60], [180, 90], [-180, 90], [-180, 90]]
+],null,false);
+
+var polygonVector = polygonImage.int().reduceToVectors({
+  geometry: polyrange,
+  crs: 'EPSG:4326',/*WGS84 would result in a fault return*/
+  scale: 1000,
+  geometryType: 'polygon',
+  labelProperty: 'urbanvector',
+  maxPixels: 1e13
+});
+
+print(polygonVector);
+Map.addLayer(polygons,{},'myPoly');
+Map.addLayer(polygonImage,{},'polygonImage');
+Map.addLayer(polygonVector,{},'polygonVector');
