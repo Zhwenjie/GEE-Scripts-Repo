@@ -2,6 +2,8 @@
 /*
 Find out the intersected features in feature collection and union it. We carry it our based on the mutual 
 conversion  between vector and image.
+reference:https://groups.google.com/forum/#!searchin/google-earth-engine-developers/intersected$20feature%7Csort:date/google-earth-engine-developers/SBX0TCA8yAQ/XHnssyMPAQAJ
+Additionally, thanks suxin and qianshuiting who are from qq group
 */
 var geometry = 
     /* color: #d63000 */
