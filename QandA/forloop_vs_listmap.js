@@ -2,7 +2,6 @@
 /* 
 conservative for loop and map in GEE.
 extract time band from TOA composited data and 
-
 */
 
 var maskClouds = function(image) {
@@ -55,7 +54,6 @@ var collectionRS_R = collection_RS.map(
     return image.addBands(image.metadata('system:time_start'))
   });
   
-
 var collectionRS_RArray = collectionRS_R.toArray();
 var axis0coll = collectionRS_RArray.arrayLength(0); // N (Image axis)
 var axis1coll = collectionRS_RArray.arrayLength(1); 
@@ -73,9 +71,6 @@ for (var i=0;i<8;i++)
   timeBand_a = timeBand_a.addBands(timeBand_.subtract(time_.arrayGet([i,0])));
 }
 
-Map.addLayer(timeBand_a ,{},'timeBand_a');
-
-
 var PositionIndex = ee.List.sequence(0,7).map(
     function (xi) {
         var timeBand_b = timeBand_.eq(0);
@@ -85,8 +80,10 @@ var PositionIndex = ee.List.sequence(0,7).map(
        
 print('PositionIndex');
 print(PositionIndex);    
-Map.addLayer(ee.Image(PositionIndex.get(0)) ,{},'PositionIndex');
 
 var vizParams = {bands: ['B4', 'B3', 'B2'], min: 0, max: 0.5, gamma: 1.3};
+
+Map.addLayer(ee.Image(PositionIndex.get(0)) ,{},'PositionIndex');
+Map.addLayer(timeBand_a ,{},'timeBand_a');
 Map.setCenter(114.20, 22.2643, 12);
 Map.addLayer(recentValueComposite, vizParams, 'recent value composite');    
