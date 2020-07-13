@@ -10,15 +10,8 @@ leader author: Wenjie Zhang
 
 ### Q and A
 
-1. [Network issues during the use of Python api](([gif]()|[gee scripts](https://code.earthengine.google.com/080bc8258774641c44caf4f818ecc721))
+1. [Network issues during the use of Python api]([gee scripts](https://code.earthengine.google.com/080bc8258774641c44caf4f818ecc721))
 2. 
-
-
-
-1. **Network issues during the use of Python api.** 
-
-    If the error appears' HTTP ', 'SSL', etc., it is almost certainly a proxy configuration problem.
-
     
 
 ### TinyProjects
